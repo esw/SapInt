@@ -141,6 +141,7 @@ INSTALLED_APPS = (
 #    'extensions',
     'unidades',
     'catalogo',
+    'sapcat',
     'aluminio',
 #    'threadedcomments',
 #    'mailer',
@@ -159,6 +160,8 @@ INSTALLED_APPS = (
 #EMAIL_HOST = 'localhost'
 #EMAIL_PORT = 1025
 
+DELIM_CSV = '\t'
+
 ARCH_IMP_DIR = 'imp_aluminio'
 ARCH_IMP_ROOT = os.path.join(PROJECT_DIR + os.sep + ARCH_IMP_DIR)
 ARCH_EXP_DIR = 'exp_aluminio'
@@ -166,7 +169,14 @@ ARCH_EXP_ROOT = os.path.join(PROJECT_DIR + os.sep + ARCH_EXP_DIR)
 
 IMP_REFS = {
     'arch_acabados': 'acabados.txt',
+    'arch_acabados_wms': 'acabados_wms.txt',
+    'arch_alums': 'alums.txt',
     'arch_refs' : 'referencias.txt',
+    'arch_refs_wms' : 'referencias_wms.txt',
+    'arch_sapalums' : 'sapalums.txt',
+    'arch_ubicaciones':'ubicaciones.txt',
+    'arch_ubicaciones_wms':'ubicaciones_wms.txt',
+    'arch_saldos_wms': 'saldos_wms.txt',
 }
 
 L_SETTINGS_DIR = os.path.abspath(PROJECT_DIR + os.sep + '..' + os.sep + 'sapint_settings')
