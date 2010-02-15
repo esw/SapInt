@@ -16,15 +16,15 @@ COL_REFS = {
     'aleacion':1,
     'temple':2,
     'pesolineal':3,
-    #'perim_exp':4,
-    'unbw':4,
+    'perim_exp':4,
+    'unbw':5,
 }
 
 def get_reader():
     arch = os.path.join(ARCH_IMP_ROOT + os.sep + IMP_REFS['arch_refs'])
     return csv.reader(open(arch, 'rU'),delimiter=DELIM_CSV)
 
-BOOL_TRUE_VALS = ['TRUE','True','1','Verdadero','VERDADERO','SI','si','Si','T','t','U']
+BOOL_TRUE_VALS = ['TRUE','True','1','Verdadero','VERDADERO','V','v','SI','si','Si','T','t','U']
 
 def get_boolean(string):
     if string in BOOL_TRUE_VALS: return True
@@ -96,8 +96,8 @@ class Command(NoArgsCommand):
                     aleacion = row[COL_REFS['aleacion']],
                     temple = row[COL_REFS['temple']],
                     peso_lineal = row[COL_REFS['pesolineal']],
-                    #perim_exp = row[COL_REFS['perim_exp']],
-                    perim_exp = None,
+                    perim_exp = row[COL_REFS['perim_exp']],
+                    #perim_exp = None,
                     unbw = get_boolean(row[COL_REFS['unbw']]),
                 )
             except:

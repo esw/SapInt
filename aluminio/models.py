@@ -3,17 +3,22 @@ from django.db.models.aggregates import Sum
 from string import zfill
 from decimal import Decimal
 from math import floor
+from django.core.exceptions import ObjectDoesNotExist
 
-ALUM_COD_SAP_MAT = 'COD_ALUM'
-SCRAP_COD_SAP_MAT = 'COD_SCRAP'
+SCRAP_COD_SAP_MAT = '20000005'
 PRIMER_CONS_CALC = 48.77
-PRIMER_COD_SAP_MAT = 'CODPRIMER'
+PRIMER_COD_SAP_MAT = '30000719'
+DCLEAR_COD_SAP_MAT = '30006608'
+DCLEAR_CONS_CALC = 32.51
+
 
 class TipoAcabado(models.Model):
     nombre = models.CharField('Nombre',max_length=30)
     cons_calc = models.FloatField('Constante Calculo (m2/gal)', null=True, blank=True)
     primer = models.BooleanField('Utiliza Primer', default=False)
+    d_clear = models.BooleanField('Utiliza Duranar Clear', default=False)
     prod_scheduler = models.CharField('Prod Scheduler', max_length=30, null=True, blank=True)
+    texto_lista = models.CharField('Texto Lista Material', max_length=40, null=True, blank=True)
     class Meta:
         verbose_name = 'Tipo Acabado'
         verbose_name_plural = 'Tipos Acabados'
@@ -21,6 +26,14 @@ class TipoAcabado(models.Model):
         unique_together = ('nombre',)
     def __unicode__(self):
         return u'%s' % self.nombre
+    def grupo_hr(self):
+        if self.prod_scheduler=='ALA':
+            return '10000000'
+        if self.prod_scheduler=='ALC':
+            return '10000001'
+        if self.prod_scheduler=='ALP':
+            return '10000002'
+        return '10000001'
 
 class GrupoValoracion(models.Model):
     codigo = models.CharField('Codigo', max_length=30)
@@ -50,16 +63,23 @@ class Acabado(models.Model):
     def prod_scheduler(self):
         if self.tipo is not None: return self.tipo.prod_scheduler
         return None
+    @property
+    def texto_lista(self):
+        return self.tipo.texto_lista
+    @property
+    def grupo_hr(self):
+        return self.tipo.grupo_hr()
     
 class Aleacion(models.Model):
     codigo = models.CharField('Codigo',max_length=10)
+    especial = models.BooleanField(default=True)
     class Meta:
         verbose_name = 'Aleacion'
         verbose_name_plural = 'Aleaciones'
         ordering = ['codigo']
         unique_together = ('codigo',)
     def __unicode__(self):
-        return u'%s' % self.codigo
+        return u'%s' % self.codigo        
     
 class Temple(models.Model):
     codigo = models.CharField('Codigo',max_length=5)
@@ -89,6 +109,24 @@ class Referencia(models.Model):
     def save(self, *args, **kwargs):
         self.peso_lineal = round(self.peso_lineal,3)
         super(Referencia, self).save(*args, **kwargs)
+
+TIPO_NAC = 'NAC'
+TIPO_IMP = 'IMP'
+TIPO_CHI = 'CHI'
+TIPOS_TOCHO = (
+    (TIPO_NAC,'Nacional'),
+    (TIPO_IMP,'Importado'),
+    (TIPO_CHI,'Chino'),
+    )
+
+class Tocho(models.Model):
+    tipo = models.CharField('Tipo Tocho', choices=TIPOS_TOCHO, max_length=30)
+    aleacion = models.ForeignKey(Aleacion)
+    cod_sap = models.CharField('Cod_Sap', max_length=40)
+    class Meta:
+        unique_together = (('tipo','aleacion'),('cod_sap',),)
+    def __unicode__(self):
+        return u'%s %s' % (self.tipo,self.aleacion)
 
 class UbicacionSap(models.Model):
     codigo = models.CharField('Codigo', max_length=30)
@@ -193,7 +231,7 @@ class SapAluminio(models.Model):
         verbose_name = 'Aluminio MatSAP'
         verbose_name_plural = 'Aluminios MatSAP'
         ordering = ['id','cod_sap','referencia','aleacion','temple','acabado','largo_mm']
-        unique_together = ('referencia','aleacion','temple','acabado','largo_mm','tipo_mat')
+        unique_together = (('referencia','aleacion','temple','acabado','largo_mm','tipo_mat'),('cod_sap',))
     def save(self, *args, **kwargs):
         #if self.grupo_val is None and self.acabado.grupo_val is not None:
         #    self.grupo_val = self.acabado.grupo_val
@@ -232,6 +270,9 @@ class SapAluminio(models.Model):
     def peso_kg(self):
         return round((float(self.largo_mm) / 1000) * self.referencia.peso_lineal,3)
     @property
+    def peso_kg_str(self):
+        return str(self.peso_kg).replace('.',',')
+    @property
     def perim_exp(self):
         return self.referencia.perim_exp
     @property
@@ -243,6 +284,9 @@ class SapAluminio(models.Model):
     def prod_scheduler(self):
         return self.acabado.prod_scheduler
     @property
+    def texto_lista(self):
+        return self.acabado.texto_lista
+    @property
     def pintado(self):
         if self.acabado.tipo.cons_calc == 0: return False
         else: return True
@@ -250,23 +294,44 @@ class SapAluminio(models.Model):
     def primer(self):
         return self.acabado.tipo.primer
     @property
+    def d_clear(self):
+        return self.acabado.tipo.d_clear
+    @property
     def cod_acabado(self):
         return self.acabado.cod_sap_mat
+    @property
+    def grupo_hr(self):
+        return self.acabado.grupo_hr
+    def get_cod_tocho(self, tipo):
+        try:
+            return Tocho.objects.get(aleacion=self.aleacion,tipo=tipo).cod_sap
+        except ObjectDoesNotExist:
+            return None
     @property
     def cod_primer(self):
         return PRIMER_COD_SAP_MAT
     @property
+    def cod_dclear(self):
+        return DCLEAR_COD_SAP_MAT
+    @property
     def cant_acabado(self):
         area_exp = self.area_exp
         cons_calc = self.acabado.tipo.cons_calc
-        if area_exp and cons_calc: return area_exp / cons_calc
+        if area_exp and cons_calc: return round(area_exp / cons_calc, 3)
         return None
     @property
     def cant_primer(self):
         if not self.acabado.tipo.primer: return 0
         area_exp = self.area_exp
         cons_calc = PRIMER_CONS_CALC
-        if area_exp and cons_calc: return area_exp / cons_calc
+        if area_exp and cons_calc: return round(area_exp / cons_calc, 3)
+        return None
+    @property
+    def cant_dclear(self):
+        if not self.acabado.tipo.d_clear: return 0
+        area_exp = self.area_exp
+        cons_calc = DCLEAR_CONS_CALC
+        if area_exp and cons_calc: return round(area_exp / cons_calc, 3)
         return None
     @property
     def costo_kg(self):

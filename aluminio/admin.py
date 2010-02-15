@@ -3,19 +3,19 @@ from django.contrib import admin
 from aluminio.models import *
 
 class TipoAcabadoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'cons_calc', 'primer','prod_scheduler')
+    list_display = ('nombre', 'cons_calc', 'primer','d_clear','prod_scheduler','texto_lista')
     list_filter = ('primer',)
 
 class GrupoValoracionAdmin(admin.ModelAdmin):
     list_display = ('codigo','valor_total','peso_total_kg')
 
 class AcabadoAdmin(admin.ModelAdmin):
-    list_display = ('nombre','tipo','prod_alutions','prod_scheduler','grupo_mat')
+    list_display = ('nombre','tipo','prod_alutions','prod_scheduler','grupo_mat','cod_sap_mat')
     list_filter = ('tipo','prod_alutions')
     search_fields = ['nombre']
     
 class AleacionAdmin(admin.ModelAdmin):
-    list_display = ('codigo',)
+    list_display = ('codigo','especial')
 
 class TempleAdmin(admin.ModelAdmin):
     list_display = ('codigo',)
@@ -38,6 +38,11 @@ class AcabadoSAntAdmin(admin.ModelAdmin):
     list_filter = ('sistema',)
     search_fields = ['acab_ant']
     
+class TochoAdmin(admin.ModelAdmin):
+    list_display = ('tipo','aleacion','cod_sap')
+    list_filter = ('tipo','aleacion',)
+    search_fields = ['cod_sap']
+    
 class UbicacionSAntAdmin(admin.ModelAdmin):
     list_display = ('sistema','ubicacion_ant','ubicacion_sap')
     list_filter = ('sistema',)
@@ -54,7 +59,7 @@ make_cargado.short_description = "Cambiar estado de Cargado a los seleccionados"
 class SapAluminioAdmin(admin.ModelAdmin):
     list_display = ('id','cod_sap','referencia','aleacion','temple','acabado','largo_mm','peso_lineal','peso_kg','tipo_mat','cargado')
     list_filter = ('cargado','tipo_mat','aleacion','temple','acabado')
-    search_fields = ['referencia']
+    search_fields = ['cod_sap']
     exclude = ('cargado','cod_sap')
     actions = [make_sin_cargar]
 
@@ -69,6 +74,7 @@ admin.site.register(Acabado, AcabadoAdmin)
 admin.site.register(Aleacion, AleacionAdmin)
 admin.site.register(Temple, TempleAdmin)
 admin.site.register(Referencia, ReferenciaAdmin)
+admin.site.register(Tocho, TochoAdmin)
 admin.site.register(UbicacionSap,UbicacionSapAdmin)
 admin.site.register(ReferenciaSAnt, ReferenciaSAntAdmin)
 admin.site.register(AcabadoSAnt, AcabadoSAntAdmin)

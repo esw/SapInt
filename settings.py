@@ -172,6 +172,7 @@ IMP_REFS = {
     'arch_acabados_wms': 'acabados_wms.txt',
     'arch_alums': 'alums.txt',
     'arch_refs' : 'referencias.txt',
+    'arch_refs_pexp' : 'referencias_pexp.txt',
     'arch_refs_wms' : 'referencias_wms.txt',
     'arch_sapalums' : 'sapalums.txt',
     'arch_ubicaciones':'ubicaciones.txt',
