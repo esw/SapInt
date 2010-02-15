@@ -147,7 +147,7 @@ INSTALLED_APPS = (
 #    'mailer',
 #    'notification',
 #    'reversion',
-#    'chronograph',
+    'chronograph',
 #    'navbar',
 #    'logger',
 )

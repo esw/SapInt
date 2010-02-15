@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/21/trunk/chronograph/templates/admin/chronograph/job
+END
+change_list.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/18/trunk/chronograph/templates/admin/chronograph/job/change_list.html
+END
+change_form.html
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/21/trunk/chronograph/templates/admin/chronograph/job/change_form.html
+END

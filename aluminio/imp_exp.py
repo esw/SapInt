@@ -409,7 +409,7 @@ def exp_alum_mat():
     wout_5 = get_writer(ARCH_32_5)
     wout_6 = get_writer(ARCH_32_6)
     wout_A = get_writer(ARCH_32_A)
-    wout_CDATA = get_writer(ARCH_CDATA)
+    #wout_CDATA = get_writer(ARCH_CDATA)
     wout_LISTA = get_writer(ARCH_LISTA)
     wout_BOM_PP = get_writer(ARCH_BOM_PP)
     wout_VFAB = get_writer(ARCH_VFAB)
@@ -421,7 +421,7 @@ def exp_alum_mat():
     wout_5.writerow(get_headers_from_dicts(DICT_ROW_32_5))
     wout_6.writerow(get_headers_from_dicts(DICT_ROW_32_6))
     wout_A.writerow(get_headers_from_dicts(DICT_ROW_32_A))
-    wout_CDATA.writerow(get_headers_from_dicts(DICT_ROW_CDATA))
+    #wout_CDATA.writerow(get_headers_from_dicts(DICT_ROW_CDATA))
     #wout_LISTA.writerow()
     
     cod_fert = SapAluminio.objects.next_cod_fert()
@@ -443,7 +443,7 @@ def exp_alum_mat():
         rows_32_5 = get_rows_32_5(s_alum)
         rows_32_6 = get_rows_32_6(s_alum)
         rows_32_A = get_rows_32_A(s_alum)
-        rows_CDATA = get_rows_CDATA(s_alum)
+        #rows_CDATA = get_rows_CDATA(s_alum)
         rows_LISTA = [s_alum.row_lista(),]
         rows_BOM_PP = get_rows_BOM_PP(s_alum)
         rows_VFAB = get_rows_VFAB(s_alum)
@@ -455,8 +455,7 @@ def exp_alum_mat():
         wout_5.writerows(rows_32_5)
         wout_6.writerows(rows_32_6)
         wout_A.writerows(rows_32_A)
-        wout_CDATA.writerows(rows_CDATA)
+        #wout_CDATA.writerows(rows_CDATA)
         wout_LISTA.writerows(rows_LISTA)
         wout_BOM_PP.writerows(rows_BOM_PP)
         wout_VFAB.writerows(rows_VFAB)
-    
